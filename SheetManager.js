@@ -1301,3 +1301,14 @@ function processBufferChanges(clientName) {
       };
     }
   }
+
+/**
+ * Get the spreadsheet ID for a company by name using dynamic config
+ */
+function getCompanySpreadsheetIdByName(companyName) {
+  const client = getClientByName(companyName);
+  if (client) {
+    return client.spreadsheetId;
+  }
+  throw new Error('Company not found: ' + companyName);
+}

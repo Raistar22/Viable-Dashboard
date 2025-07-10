@@ -1983,6 +1983,47 @@
                 }
             });
         });
+
+        // Fetch and render all companies dynamically
+        function renderClients() {
+          google.script.run.withSuccessHandler(function(clients) {
+            const grid = document.querySelector('.clients-grid');
+            grid.innerHTML = '';
+            clients.forEach(client => {
+              const card = document.createElement('div');
+              card.className = 'client-card';
+              card.innerHTML = `
+                <div class="client-header">
+                  <div class="client-name">${client.name}</div>
+                  <div class="client-label">${client.gmailLabel}</div>
+                </div>
+                <div class="client-body">
+                  <button onclick="openDashboard('${client.name}')">Dashboard</button>
+                  <button onclick="openSheet('${client.spreadsheetId}')">Sheet</button>
+                  <button onclick="openFolder('${client.rootFolderId}')">Folder</button>
+                  <button onclick="openGmail('${client.gmailLabel}')">Gmail</button>
+                </div>
+              `;
+              grid.appendChild(card);
+            });
+          }).getAllClients();
+        }
+
+        function openDashboard(companyName) {
+          // Implement navigation to the company's dashboard (customize as needed)
+          alert('Open dashboard for ' + companyName);
+        }
+        function openSheet(sheetId) {
+          window.open('https://docs.google.com/spreadsheets/d/' + sheetId, '_blank');
+        }
+        function openFolder(folderId) {
+          window.open('https://drive.google.com/drive/folders/' + folderId, '_blank');
+        }
+        function openGmail(label) {
+          window.open('https://mail.google.com/mail/u/0/#label/' + encodeURIComponent(label), '_blank');
+        }
+
+        document.addEventListener('DOMContentLoaded', renderClients);
     </script>
 </body>
 </html>

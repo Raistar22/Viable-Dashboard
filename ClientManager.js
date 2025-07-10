@@ -65,15 +65,19 @@ class ClientConfig {
       const spreadsheet = SpreadsheetApp.openById(masterSheetId);
       const sheet = spreadsheet.getActiveSheet();
       
-      // Validate sheet has data
-      if (sheet.getLastRow() < 1) {
-        debugLog('Master config sheet is empty');
-        return [];
+      // Auto-create headers if missing
+      const requiredHeaders = ['Client Name', 'Gmail Label', 'Root Folder ID', 'Spreadsheet ID', 'Status'];
+      let data = sheet.getDataRange().getValues();
+      if (data.length === 0 || data[0].length < requiredHeaders.length || requiredHeaders.some((h, i) => data[0][i] !== h)) {
+        // Set headers in the first row
+        sheet.clear();
+        sheet.getRange(1, 1, 1, requiredHeaders.length).setValues([requiredHeaders]);
+        data = [requiredHeaders];
       }
       
-      const data = sheet.getDataRange().getValues();
+      // Validate sheet has data
       if (data.length <= 1) {
-        debugLog('No client data found in master config sheet');
+        debugLog('Master config sheet is empty');
         return [];
       }
       
@@ -81,7 +85,6 @@ class ClientConfig {
       const clients = [];
       
       // Validate headers
-      const requiredHeaders = ['Client Name', 'Gmail Label', 'Root Folder ID', 'Spreadsheet ID', 'Status'];
       const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
       if (missingHeaders.length > 0) {
         throw createError(
@@ -240,6 +243,13 @@ class ClientConfig {
       const masterSheetId = getMasterConfigSheetId();
       const masterSpreadsheet = SpreadsheetApp.openById(masterSheetId);
       const masterSheet = masterSpreadsheet.getActiveSheet();
+      // Ensure headers exist before appending
+      const requiredHeaders = ['Client Name', 'Gmail Label', 'Root Folder ID', 'Spreadsheet ID', 'Status'];
+      let data = masterSheet.getDataRange().getValues();
+      if (data.length === 0 || data[0].length < requiredHeaders.length || requiredHeaders.some((h, i) => data[0][i] !== h)) {
+        masterSheet.clear();
+        masterSheet.getRange(1, 1, 1, requiredHeaders.length).setValues([requiredHeaders]);
+      }
       
       // Final check for duplicates (race condition protection)
       const currentData = masterSheet.getDataRange().getValues();
