@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Automation Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .system-status {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .status-dot.degraded, .status-dot.warning { 
+            background: var(--warning-color); 
+        }
+        
+        .status-dot.error, .status-dot.unhealthy { 
+            background: var(--error-color); 
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .client-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .client-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .client-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--gray-800), var(--gray-700));
+            color: white;
+        }
+
+        .client-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .client-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .client-body {
+            padding: 1.5rem;
+        }
+
+        .client-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .client-stat {
+            text-align: center;
+        }
+
+        .client-stat-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .client-stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+        }
+
+        .client-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2563eb;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-50);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .floating-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            background: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--gray-800);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .system-health {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .health-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .health-healthy {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .health-degraded {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .health-unhealthy {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .processing-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .clients-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .floating-actions {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .client-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .client-actions {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-chart-line"></i> FinTech Automation</h1>
+                    <p>Automated document processing and financial data management</p>
+                </div>
+                <div class="system-status">
+                    <div class="status-indicator">
+                        <div class="status-dot" id="systemStatusDot"></div>
+                        <span id="systemStatusText">System Loading...</span>
+                    </div>
+                    <div class="system-health">
+                        <span id="activeClientsCount">0 Active Clients</span>
+                        <span class="status-chip status-pending" id="pendingChangesChip" style="display: none;">
+                            <i class="fas fa-clock"></i> <span id="pendingChangesCount">0</span> Pending
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- System Overview -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="fas fa-users"></i> Clients Overview</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalClientsCount">0</span>
+                            <span class="stat-label">Total Clients</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="activeClientsStatCount">0</span>
+                            <span class="stat-label">Active</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="configuredClientsCount">0</span>
+                            <span class="stat-label">Configured</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">
+                                <span class="health-badge" id="systemHealthBadge">Loading</span>
+                            </span>
+                            <span class="stat-label">System Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-cogs"></i> Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" onclick="processAllGmail()" id="processAllGmailBtn">
+                            <i class="fas fa-envelope"></i> Process All Gmail
+                        </button>
+                        <button class="btn btn-success" onclick="processAllAI()" id="processAllAIBtn">
+                            <i class="fas fa-robot"></i> Process All with AI
+                        </button>
+                        <button class="btn btn-warning" onclick="showSystemStatus()">
+                            <i class="fas fa-info-circle"></i> System Diagnostics
+                        </button>
+                        <button class="btn btn-outline" onclick="refreshDashboard()">
+                            <i class="fas fa-sync"></i> Refresh Dashboard
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" id="systemIssuesCard" style="display: none;">
+                    <h3><i class="fas fa-exclamation-triangle"></i> System Issues</h3>
+                    <div class="alert alert-warning">
+                        <strong>Attention Required:</strong>
+                        <ul id="systemIssuesList" style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                        </ul>
+                    </div>
+                    <button class="btn btn-warning" onclick="runSystemDiagnostic()">
+                        <i class="fas fa-wrench"></i> Run Diagnostic
+                    </button>
+                </div>
+            </div>
+
+            <!-- Clients Section -->
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3><i class="fas fa-building"></i> Client Management</h3>
+                
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h4>Loading Clients...</h4>
+                    <p>Please wait while we load your client configuration</p>
+                </div>
+
+                <div id="clientsGrid" class="clients-grid" style="display: none;">
+                    <!-- Clients will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card" id="recentActivityCard" style="display: none;">
+                <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                <div id="recentActivity">
+                    <div class="processing-indicator">
+                        <i class="fas fa-sync fa-spin"></i>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="floating-actions">
+        <button class="fab" onclick="showAddClientModal()" title="Add New Client">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+
+    <!-- Add Client Modal -->
+    <div id="addClientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Client</h3>
+                <button class="close-btn" onclick="hideAddClientModal()" aria-label="Close">&times;</button>
+            </div>
+            <form id="addClientForm" onsubmit="addClient(event)">
+                <div class="form-group">
+                    <label class="form-label" for="clientName">
+                        <i class="fas fa-building"></i> Client Name *
+                    </label>
+                    <input 
+                        type="text" 
+                        id="clientName"
+                        name="clientName" 
+                        class="form-input" 
+                        required 
+                        placeholder="Enter client name (e.g., ABC Corporation)"
+                        maxlength="50"
+                    >
+                    <small style="color: var(--gray-600); font-size: 0.875rem;">
+                        This will be used for folder and file organization
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="gmailLabel">
+                        <i class="fas fa-tag"></i> Gmail Label *
+                    </label>
+                    <input 
+                        type="text" 
+                        id="gmailLabel"
+                        name="gmailLabel" 
+                        class="form-input" 
+                        required 
+                        placeholder="client-name"
+                        pattern="[a-zA-Z0-9-_]+"
+                        title="Only letters, numbers, hyphens, and underscores allowed"
+                    >
+                    <small style="color: var(--gray-600); font-size: 0.875rem;">
+                        Gmail label to monitor for attachments. Must exist in your Gmail.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="parentFolderId">
+                        <i class="fas fa-folder"></i> Parent Folder ID (Optional)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="parentFolderId"
+                        name="parentFolderId" 
+                        class="form-input" 
+                        placeholder="Leave empty to create in Google Drive root"
+                    >
+                    <small style="color: var(--gray-600); font-size: 0.875rem;">
+                        Google Drive folder ID where client folder will be created
+                    </small>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-outline" onclick="hideAddClientModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="addClientSubmitBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-plus"></i> Add Client
+                        </span>
+                        <div class="loading" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="statusModalTitle">Status</h3>
+                <button class="close-btn" onclick="hideStatusModal()" aria-label="Close">&times;</button>
+            </div>
+            <div id="statusContent">
+                <!-- Status content will be populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentOperation = null;
+        let refreshTimer = null;
+        let dashboardData = {
+            clients: [],
+            systemStatus: {}
+        };
+        const REFRESH_INTERVAL = 60000; // 60 seconds
+
+        // Check if running in Google Apps Script environment
+        function isGoogleAppsScriptEnvironment() {
+            return typeof google !== 'undefined' && google.script && google.script.run;
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('FinTech Dashboard initialized');
+            
+            // Initialize modals properly
+            initializeModals();
+            
+            if (!isGoogleAppsScriptEnvironment()) {
+                showDevelopmentMode();
+                return;
+            }
+            
+            initializeDashboard();
+            initializeKeyboardShortcuts();
+        });
+
+        // Fixed modal initialization - doesn't interfere with navigation
+        function initializeModals() {
+            // Handle modal backdrop clicks only
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            });
+            
+            // Handle close button clicks
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('close-btn') || event.target.closest('.close-btn')) {
+                    const modal = event.target.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Show development mode message
+        function showDevelopmentMode() {
+            console.warn('Google Apps Script API not available - running in development mode');
+            
+            // Show development mode message
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) {
+                emptyState.innerHTML = `
+                    <i class="fas fa-code"></i>
+                    <h4>Development Mode</h4>
+                    <p>This dashboard requires Google Apps Script environment to function properly.</p>
+                    <p>Please deploy this HTML file through Google Apps Script to access full functionality.</p>
+                    <button class="btn btn-primary" onclick="showMockData()">
+                        <i class="fas fa-eye"></i> View with Mock Data
+                    </button>
+                `;
+                emptyState.style.display = 'block';
+            }
+            
+            // Update system status for development
+            document.getElementById('systemStatusText').textContent = 'Development Mode';
+            document.getElementById('systemStatusDot').className = 'status-dot warning';
+            document.getElementById('activeClientsCount').textContent = 'Development Environment';
+        }
+
+        // Show mock data for development/testing
+        function showMockData() {
+            // Mock system status
+            dashboardData.systemStatus = {
+                systemHealth: 'healthy',
+                totalClients: 2,
+                activeClients: 2,
+                pendingChanges: 0
+            };
+            
+            // Mock clients data
+            dashboardData.clients = [
+                {
+                    name: 'Sample Client 1',
+                    gmailLabel: 'client-sample1',
+                    status: 'Active',
+                    lastModified: new Date().toISOString(),
+                    rootFolderId: 'mock-folder-id-1',
+                    spreadsheetId: 'mock-sheet-id-1'
+                },
+                {
+                    name: 'Sample Client 2', 
+                    gmailLabel: 'client-sample2',
+                    status: 'Active',
+                    lastModified: new Date().toISOString(),
+                    rootFolderId: 'mock-folder-id-2',
+                    spreadsheetId: 'mock-sheet-id-2'
+                }
+            ];
+            
+            updateSystemStatusDisplay();
+            updateClientsDisplay();
+            
+            // Show mock recent activity
+            const activityCard = document.getElementById('recentActivityCard');
+            const activityElement = document.getElementById('recentActivity');
+            if (activityCard && activityElement) {
+                activityCard.style.display = 'block';
+                activityElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--gray-200);">
+                        <div>
+                            <strong>Sample Client 1</strong>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                0 pending operations
+                            </div>
+                        </div>
+                        <span class="status-chip status-active">
+                            <i class="fas fa-check-circle"></i> healthy
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0;">
+                        <div>
+                            <strong>Sample Client 2</strong>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                0 pending operations
+                            </div>
+                        </div>
+                        <span class="status-chip status-active">
+                            <i class="fas fa-check-circle"></i> healthy
+                        </span>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize dashboard with data loading
+        function initializeDashboard() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showDevelopmentMode();
+                return;
+            }
+            
+            loadDashboardData();
+            startAutoRefresh();
+        }
+
+        // Safe Google Apps Script call wrapper
+        function safeGoogleScriptCall(functionName, successCallback, errorCallback, ...args) {
+            if (!isGoogleAppsScriptEnvironment()) {
+                console.warn(`Cannot call ${functionName} - Google Apps Script not available`);
+                if (errorCallback) {
+                    errorCallback(new Error('Google Apps Script environment not available'));
+                }
+                return;
+            }
+            
+            try {
+                const scriptRun = google.script.run
+                    .withSuccessHandler(successCallback)
+                    .withFailureHandler(errorCallback || function(error) {
+                        console.error(`Error calling ${functionName}:`, error);
+                    });
+                
+                // Call the function with provided arguments
+                scriptRun[functionName](...args);
+                
+            } catch (error) {
+                console.error(`Error setting up call to ${functionName}:`, error);
+                if (errorCallback) {
+                    errorCallback(error);
+                }
+            }
+        }
+
+        // Load all dashboard data
+        function loadDashboardData() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showDevelopmentMode();
+                return;
+            }
+            
+            // Load system status first
+            safeGoogleScriptCall(
+                'getSystemStatus',
+                function(status) {
+                    dashboardData.systemStatus = status || {};
+                    updateSystemStatusDisplay();
+                    
+                    // Then load clients
+                    loadClientsData();
+                },
+                function(error) {
+                    console.warn('Failed to load system status:', error);
+                    updateSystemStatusDisplay();
+                    loadClientsData();
+                }
+            );
+        }
+
+        // Load clients data
+        function loadClientsData() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                return;
+            }
+            
+            safeGoogleScriptCall(
+                'getActiveClients',
+                function(clients) {
+                    dashboardData.clients = clients || [];
+                    updateClientsDisplay();
+                    loadClientStatistics();
+                    
+                    if (dashboardData.clients.length > 0) {
+                        loadRecentActivity();
+                    }
+                },
+                function(error) {
+                    console.warn('Failed to load clients:', error);
+                    showEmptyState('Error loading clients: ' + (error.message || error));
+                }
+            );
+        }
+
+        // Update system status display
+        function updateSystemStatusDisplay() {
+            const status = dashboardData.systemStatus;
+            
+            // Update status dot and text
+            const statusDot = document.getElementById('systemStatusDot');
+            const statusText = document.getElementById('systemStatusText');
+            
+            if (statusDot && statusText) {
+                const health = status.systemHealth || 'healthy';
+                statusDot.className = `status-dot ${health.toLowerCase()}`;
+                statusText.textContent = `System ${health}`;
+            }
+            
+            // Update client counts
+            const activeClientsCount = document.getElementById('activeClientsCount');
+            if (activeClientsCount) {
+                activeClientsCount.textContent = `${status.activeClients || 0} Active Clients`;
+            }
+            
+            // Update pending changes
+            const pendingChip = document.getElementById('pendingChangesChip');
+            const pendingCount = document.getElementById('pendingChangesCount');
+            if (pendingChip && pendingCount) {
+                if (status.pendingChanges && status.pendingChanges > 0) {
+                    pendingCount.textContent = status.pendingChanges;
+                    pendingChip.style.display = 'inline-flex';
+                } else {
+                    pendingChip.style.display = 'none';
+                }
+            }
+            
+            // Update stats
+            const totalClientsCount = document.getElementById('totalClientsCount');
+            const activeClientsStatCount = document.getElementById('activeClientsStatCount');
+            const systemHealthBadge = document.getElementById('systemHealthBadge');
+            
+            if (totalClientsCount) totalClientsCount.textContent = status.totalClients || 0;
+            if (activeClientsStatCount) activeClientsStatCount.textContent = status.activeClients || 0;
+            if (systemHealthBadge) {
+                const health = status.systemHealth || 'healthy';
+                systemHealthBadge.className = `health-badge health-${health.toLowerCase()}`;
+                systemHealthBadge.textContent = health;
+            }
+            
+            // Show system issues if any
+            if (status.issues && status.issues.length > 0) {
+                showSystemIssues(status.issues);
+            }
+        }
+
+        // Update clients display
+        function updateClientsDisplay() {
+            const emptyState = document.getElementById('emptyState');
+            const clientsGrid = document.getElementById('clientsGrid');
+            const configuredCount = document.getElementById('configuredClientsCount');
+            
+            if (configuredCount) {
+                configuredCount.textContent = dashboardData.clients.length;
+            }
+            
+            if (dashboardData.clients.length === 0) {
+                showEmptyState('No clients configured. Get started by adding your first client to begin processing financial documents.');
+                return;
+            }
+            
+            // Hide empty state and show clients grid
+            if (emptyState) emptyState.style.display = 'none';
+            if (clientsGrid) {
+                clientsGrid.style.display = 'grid';
+                clientsGrid.innerHTML = '';
+                
+                dashboardData.clients.forEach(client => {
+                    const clientCard = createClientCard(client);
+                    clientsGrid.appendChild(clientCard);
+                });
+            }
+        }
+
+        // Fixed createClientCard function with proper navigation
+        function createClientCard(client) {
+            const card = document.createElement('div');
+            card.className = 'client-card';
+            
+            // Build the client dashboard URL properly
+            const baseUrl = window.location.href.split('?')[0];
+            const clientDashboardUrl = `${baseUrl}?page=client&client=${encodeURIComponent(client.name)}`;
+            
+            card.innerHTML = `
+                <div class="client-header">
+                    <div class="client-name">
+                        <i class="fas fa-building"></i> ${escapeHtml(client.name)}
+                    </div>
+                    <div class="client-label">
+                        <i class="fas fa-tag"></i> ${escapeHtml(client.gmailLabel)}
+                    </div>
+                </div>
+                <div class="client-body">
+                    <div class="client-stats">
+                        <div class="client-stat">
+                            <div class="client-stat-number">0</div>
+                            <div class="client-stat-label">Pending Gmail</div>
+                        </div>
+                        <div class="client-stat">
+                            <div class="client-stat-number">0</div>
+                            <div class="client-stat-label">Pending AI</div>
+                        </div>
+                        <div class="client-stat">
+                            <div class="client-stat-number">0</div>
+                            <div class="client-stat-label">Processed</div>
+                        </div>
+                    </div>
+                    
+                    <div class="processing-indicator">
+                        <span class="status-chip status-active">
+                            <i class="fas fa-check-circle"></i> Ready
+                        </span>
+                        <span style="font-size: 0.75rem; color: var(--gray-500);">
+                            Last updated: ${client.lastModified ? new Date(client.lastModified).toLocaleDateString() : 'Never'}
+                        </span>
+                    </div>
+                    
+                    <div class="client-actions">
+                        <a href="${clientDashboardUrl}" class="btn btn-primary client-dashboard-link" data-client-name="${escapeHtml(client.name)}">
+                            <i class="fas fa-eye"></i> Dashboard
+                        </a>
+                        <a href="https://docs.google.com/spreadsheets/d/${escapeHtml(client.spreadsheetId)}" target="_blank" class="btn btn-info" title="Open client spreadsheet">
+                            <i class="fas fa-table"></i> Sheet
+                        </a>
+                        <a href="https://drive.google.com/drive/folders/${escapeHtml(client.rootFolderId)}" target="_blank" class="btn btn-success" title="Open client folder">
+                            <i class="fas fa-folder"></i> Folder
+                        </a>
+                        <button class="btn btn-warning" onclick="processClientGmail('${escapeHtml(client.name)}')" title="Process Gmail for this client">
+                            <i class="fas fa-envelope"></i> Gmail
+                        </button>
+                        <button class="btn btn-outline" onclick="processClientAI('${escapeHtml(client.name)}')" title="Process with AI for this client">
+                            <i class="fas fa-robot"></i> AI
+                        </button>
+                        <button class="btn btn-outline" onclick="showClientOptions('${escapeHtml(client.name)}')" title="More options">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Show empty state
+        function showEmptyState(message) {
+            const emptyState = document.getElementById('emptyState');
+            const clientsGrid = document.getElementById('clientsGrid');
+            
+            if (emptyState) {
+                emptyState.innerHTML = `
+                    <i class="fas fa-users"></i>
+                    <h4>No Clients Configured</h4>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="showAddClientModal()">
+                        <i class="fas fa-plus"></i> Add First Client
+                    </button>
+                `;
+                emptyState.style.display = 'block';
+            }
+            
+            if (clientsGrid) {
+                clientsGrid.style.display = 'none';
+            }
+        }
+
+        // Show system issues
+        function showSystemIssues(issues) {
+            const issuesCard = document.getElementById('systemIssuesCard');
+            const issuesList = document.getElementById('systemIssuesList');
+            
+            if (issuesCard && issuesList) {
+                issuesList.innerHTML = '';
+                issues.forEach(issue => {
+                    const li = document.createElement('li');
+                    li.textContent = issue;
+                    issuesList.appendChild(li);
+                });
+                issuesCard.style.display = 'block';
+            }
+        }
+
+        // Initialize keyboard shortcuts
+        function initializeKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                // Escape to close modals
+                if (e.key === 'Escape') {
+                    hideAllModals();
+                }
+                
+                // Ctrl/Cmd + N to add new client
+                if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                    e.preventDefault();
+                    showAddClientModal();
+                }
+                
+                // Ctrl/Cmd + R to refresh (override default)
+                if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                    e.preventDefault();
+                    refreshDashboard();
+                }
+            });
+        }
+
+        // Auto-refresh functionality
+        function startAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+            }
+            
+            refreshTimer = setInterval(function() {
+                if (!currentOperation) {
+                    loadDashboardData();
+                }
+            }, REFRESH_INTERVAL);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        // Load client statistics
+        function loadClientStatistics() {
+            if (!isGoogleAppsScriptEnvironment() || !dashboardData.clients || dashboardData.clients.length === 0) {
+                return;
+            }
+            
+            dashboardData.clients.forEach((client, index) => {
+                safeGoogleScriptCall(
+                    'getClientStatistics',
+                    function(stats) {
+                        updateClientCardStats(index, stats);
+                    },
+                    function(error) {
+                        console.warn(`Failed to load stats for ${client.name}:`, error);
+                    },
+                    client.name
+                );
+            });
+        }
+
+        function updateClientCardStats(clientIndex, stats) {
+            try {
+                const clientCards = document.querySelectorAll('.client-card');
+                const card = clientCards[clientIndex];
+                if (!card || !stats) return;
+                
+                const statNumbers = card.querySelectorAll('.client-stat-number');
+                if (statNumbers.length >= 3) {
+                    // Update pending Gmail
+                    statNumbers[0].textContent = stats.gmail?.activeFiles || 0;
+                    
+                    // Update pending AI
+                    statNumbers[1].textContent = stats.ai?.pendingProcessing || 0;
+                    
+                    // Update processed
+                    statNumbers[2].textContent = (stats.sheets?.inflow || 0) + (stats.sheets?.outflow || 0);
+                    
+                    // Update status indicator
+                    const statusChip = card.querySelector('.status-chip');
+                    if (statusChip) {
+                        const pendingTotal = (stats.gmail?.activeFiles || 0) + (stats.ai?.pendingProcessing || 0);
+                        if (pendingTotal > 0) {
+                            statusChip.className = 'status-chip status-pending';
+                            statusChip.innerHTML = `<i class="fas fa-clock"></i> ${pendingTotal} Pending`;
+                        } else {
+                            statusChip.className = 'status-chip status-active';
+                            statusChip.innerHTML = '<i class="fas fa-check-circle"></i> Up to date';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Error updating client card stats:', error);
+            }
+        }
+
+        // Load recent activity
+        function loadRecentActivity() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                return;
+            }
+            
+            const activityCard = document.getElementById('recentActivityCard');
+            const activityElement = document.getElementById('recentActivity');
+            
+            if (!activityCard || !activityElement) return;
+            
+            activityCard.style.display = 'block';
+            
+            safeGoogleScriptCall(
+                'getProcessingQueueStatus',
+                function(activity) {
+                    displayRecentActivity(activity);
+                },
+                function(error) {
+                    activityElement.innerHTML = '<div class="processing-indicator"><i class="fas fa-exclamation-triangle"></i> Failed to load activity</div>';
+                }
+            );
+        }
+
+        function displayRecentActivity(activity) {
+            const activityElement = document.getElementById('recentActivity');
+            if (!activityElement || !activity?.queue) return;
+            
+            let html = '';
+            activity.queue.forEach(function(item) {
+                const statusClass = item.status === 'healthy' ? 'status-active' : 'status-error';
+                const totalPending = (item.pendingGmail || 0) + (item.pendingAI || 0) + (item.pendingFlow || 0);
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--gray-200);">
+                        <div>
+                            <strong>${escapeHtml(item.clientName)}</strong>
+                            <div style="font-size: 0.875rem; color: var(--gray-600);">
+                                ${totalPending} pending operations
+                            </div>
+                        </div>
+                        <span class="status-chip ${statusClass}">
+                            ${item.status === 'healthy' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>'}
+                            ${item.status}
+                        </span>
+                    </div>
+                `;
+            });
+            
+            if (html === '') {
+                html = '<div class="processing-indicator"><i class="fas fa-check-circle"></i> All clients up to date</div>';
+            }
+            
+            activityElement.innerHTML = html;
+        }
+
+        // Global processing functions
+        function processAllGmail() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            if (currentOperation) {
+                showStatusModal('Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'gmail-all';
+            const btn = document.getElementById('processAllGmailBtn');
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            
+            showStatusModal('Processing Gmail for all clients...', 'info');
+
+            safeGoogleScriptCall(
+                'processAllClientsGmail',
+                function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'Gmail processing completed for all clients');
+                },
+                function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'Gmail processing failed');
+                }
+            );
+        }
+
+        function processAllAI() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            if (currentOperation) {
+                showStatusModal('Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'ai-all';
+            const btn = document.getElementById('processAllAIBtn');
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            
+            showStatusModal('Processing documents with AI for all clients...', 'info');
+
+            safeGoogleScriptCall(
+                'processAllClientsWithAI',
+                function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'AI processing completed for all clients');
+                },
+                function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'AI processing failed');
+                }
+            );
+        }
+
+        // Individual client processing
+        function processClientGmail(clientName) {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            if (currentOperation) {
+                showStatusModal('Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'client-gmail';
+            showStatusModal(`Processing Gmail for ${clientName}...`, 'info');
+
+            safeGoogleScriptCall(
+                'processClientGmailByName',
+                function(result) {
+                    currentOperation = null;
+                    onProcessComplete(result, `Gmail processing completed for ${clientName}`);
+                },
+                function(error) {
+                    currentOperation = null;
+                    onProcessError(error, `Gmail processing failed for ${clientName}`);
+                },
+                clientName
+            );
+        }
+
+        function processClientAI(clientName) {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            if (currentOperation) {
+                showStatusModal('Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'client-ai';
+            showStatusModal(`Processing documents with AI for ${clientName}...`, 'info');
+
+            safeGoogleScriptCall(
+                'processClientDocumentsWithAI',
+                function(result) {
+                    currentOperation = null;
+                    onProcessComplete(result, `AI processing completed for ${clientName}`);
+                },
+                function(error) {
+                    currentOperation = null;
+                    onProcessError(error, `AI processing failed for ${clientName}`);
+                },
+                clientName
+            );
+        }
+
+        // Button loading state management
+        function setButtonLoading(button, loading) {
+            if (!button) return;
+            
+            const icon = button.querySelector('i');
+            const text = button.querySelector('.btn-text, span');
+            const loadingEl = button.querySelector('.loading');
+            
+            if (loading) {
+                button.disabled = true;
+                button.style.opacity = '0.7';
+                if (icon && !icon.classList.contains('loading')) {
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+                if (text) text.style.display = 'none';
+                if (loadingEl) loadingEl.style.display = 'inline-block';
+            } else {
+                button.disabled = false;
+                button.style.opacity = '1';
+                if (icon) {
+                    // Restore original icon based on button
+                    if (button.id === 'processAllGmailBtn') icon.className = 'fas fa-envelope';
+                    else if (button.id === 'processAllAIBtn') icon.className = 'fas fa-robot';
+                    else if (button.id === 'addClientSubmitBtn') icon.className = 'fas fa-plus';
+                }
+                if (text) text.style.display = 'inline';
+                if (loadingEl) loadingEl.style.display = 'none';
+            }
+        }
+
+        // Process completion handlers
+        function onProcessComplete(result, defaultMessage) {
+            const message = result?.message || defaultMessage || 'Operation completed successfully';
+            showProcessResult(result, message);
+            
+            // Refresh data after completion
+            setTimeout(() => {
+                loadDashboardData();
+            }, 2000);
+        }
+
+        function onProcessError(error, context) {
+            const message = error?.message || error || 'An unknown error occurred';
+            showStatusModal(`${context}: ${message}`, 'error');
+        }
+
+        function showProcessResult(result, message) {
+            let content = '';
+            let type = 'success';
+            
+            if (result && result.success === false) {
+                type = 'error';
+                content = `<div class="alert alert-error">
+                    <h4><i class="fas fa-exclamation-circle"></i> Operation Failed</h4>
+                    <p>${escapeHtml(result.message || result.error)}</p>
+                </div>`;
+            } else {
+                content = `<div class="alert alert-success">
+                    <h4><i class="fas fa-check-circle"></i> ${escapeHtml(message)}</h4>`;
+                
+                if (result && typeof result === 'object') {
+                    content += '<div style="margin-top: 1rem;">';
+                    
+                    // Handle batch results
+                    if (Array.isArray(result.results)) {
+                        content += `<h5>Processing Summary:</h5><ul>`;
+                        result.results.forEach(item => {
+                            const icon = item.success ? '<i class="fas fa-check" style="color: var(--success-color);"></i>' : '<i class="fas fa-times" style="color: var(--error-color);"></i>';
+                            const detail = item.success ? 
+                                `${item.processedAttachments || item.processed || 0} items processed` : 
+                                `Error: ${escapeHtml(item.error)}`;
+                            content += `<li>${icon} <strong>${escapeHtml(item.client)}:</strong> ${detail}</li>`;
+                        });
+                        content += `</ul>`;
+                    }
+                    
+                    // Handle single client results
+                    if (result.deletedCount !== undefined || result.reactivatedCount !== undefined) {
+                        if (result.deletedCount > 0) {
+                            content += `<p><i class="fas fa-trash"></i> Processed ${result.deletedCount} deletions</p>`;
+                        }
+                        if (result.reactivatedCount > 0) {
+                            content += `<p><i class="fas fa-undo"></i> Processed ${result.reactivatedCount} reactivations</p>`;
+                        }
+                    }
+                    
+                    if (result.inflowCount !== undefined || result.outflowCount !== undefined) {
+                        content += `<p><i class="fas fa-arrow-up"></i> Moved ${result.inflowCount || 0} files to inflow</p>`;
+                        content += `<p><i class="fas fa-arrow-down"></i> Moved ${result.outflowCount || 0} files to outflow</p>`;
+                    }
+
+                    if (result.processedAttachments !== undefined) {
+                        content += `<p><i class="fas fa-paperclip"></i> Processed ${result.processedAttachments} attachments</p>`;
+                        if (result.totalAttachments) {
+                            content += `<p><i class="fas fa-envelope"></i> Found ${result.totalAttachments} total attachments</p>`;
+                        }
+                    }
+
+                    if (result.processed !== undefined) {
+                        content += `<p><i class="fas fa-robot"></i> Processed ${result.processed} files with AI</p>`;
+                        if (result.errors) {
+                            content += `<p><i class="fas fa-exclamation-triangle"></i> ${result.errors} errors encountered</p>`;
+                        }
+                    }
+                    
+                    content += '</div>';
+                }
+                
+                content += `</div>`;
+            }
+            
+            document.getElementById('statusContent').innerHTML = content;
+            document.getElementById('statusModalTitle').textContent = type === 'success' ? 'Success' : 'Error';
+        }
+
+        // Client management functions
+        function showAddClientModal() {
+            document.getElementById('addClientModal').style.display = 'block';
+            // Focus on first input
+            setTimeout(() => {
+                document.getElementById('clientName').focus();
+            }, 100);
+        }
+
+        function hideAddClientModal() {
+            document.getElementById('addClientModal').style.display = 'none';
+            document.getElementById('addClientForm').reset();
+        }
+
+        function addClient(event) {
+            event.preventDefault();
+            
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const submitBtn = document.getElementById('addClientSubmitBtn');
+            
+            // Validate form data
+            const clientName = formData.get('clientName').trim();
+            const gmailLabel = formData.get('gmailLabel').trim();
+            
+            if (!clientName || !gmailLabel) {
+                showStatusModal('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            // Validate Gmail label format
+            if (!/^[a-zA-Z0-9-_]+$/.test(gmailLabel)) {
+                showStatusModal('Gmail label can only contain letters, numbers, hyphens, and underscores.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            setButtonLoading(submitBtn, true);
+            
+            const clientData = {
+                clientName: clientName,
+                gmailLabel: gmailLabel,
+                parentFolderId: formData.get('parentFolderId').trim() || null
+            };
+            
+            safeGoogleScriptCall(
+                'addClientDirect',
+                function(result) {
+                    setButtonLoading(submitBtn, false);
+                    
+                    if (result && result.success !== false) {
+                        hideAddClientModal();
+                        showSuccessWithReloadButton(result.clientData.clientName);
+                    } else {
+                        const errorMessage = result?.error || result?.message || 'Unknown error occurred';
+                        showStatusModal(`Error adding client: ${errorMessage}`, 'error');
+                    }
+                },
+                function(error) {
+                    setButtonLoading(submitBtn, false);
+                    showStatusModal(`Error adding client: ${error.message || error}`, 'error');
+                },
+                clientData
+            );
+        }
+
+        function showSuccessWithReloadButton(clientName) {
+            const content = `
+                <div class="alert alert-success">
+                    <div style="text-align: center;">
+                        <h4><i class="fas fa-check-circle" style="color: var(--success-color); font-size: 3rem; margin-bottom: 1rem;"></i></h4>
+                        <h3 style="margin-bottom: 1rem;">Client Created Successfully!</h3>
+                        <p style="margin-bottom: 1.5rem; font-size: 1.1rem;">
+                            <strong>${escapeHtml(clientName)}</strong> has been added to your system with complete folder structure and spreadsheet.
+                        </p>
+                        <button class="btn btn-primary" onclick="refreshPageForced()" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                            <i class="fas fa-sync"></i> Refresh Dashboard
+                        </button>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--gray-600);">
+                            Click the button above to refresh and see your new client.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('statusContent').innerHTML = content;
+            document.getElementById('statusModalTitle').textContent = 'Success';
+            document.getElementById('statusModal').style.display = 'block';
+        }
+
+        function refreshPageForced() {
+            const baseUrl = window.location.href.split('?')[0];
+            window.location.href = baseUrl + '?_refresh=' + Date.now();
+        }
+
+        function refreshDashboard() {
+            showStatusModal('Refreshing dashboard...', 'info');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+
+        function showClientOptions(clientName) {
+            const content = `
+                <div class="alert alert-info">
+                    <h4><i class="fas fa-cog"></i> Client Options: ${escapeHtml(clientName)}</h4>
+                    <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <a href="?page=client&client=${encodeURIComponent(clientName)}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> View Client Dashboard
+                        </a>
+                        <button class="btn btn-success" onclick="processClientGmail('${escapeHtml(clientName)}'); hideStatusModal();">
+                            <i class="fas fa-envelope"></i> Process Gmail Only
+                        </button>
+                        <button class="btn btn-warning" onclick="processClientAI('${escapeHtml(clientName)}'); hideStatusModal();">
+                            <i class="fas fa-robot"></i> Process AI Only
+                        </button>
+                        <button class="btn btn-outline" onclick="validateClientSetup('${escapeHtml(clientName)}')">
+                            <i class="fas fa-check-circle"></i> Validate Setup
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('statusContent').innerHTML = content;
+            document.getElementById('statusModalTitle').textContent = 'Client Options';
+            document.getElementById('statusModal').style.display = 'block';
+        }
+
+        function validateClientSetup(clientName) {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            showStatusModal(`Validating setup for ${clientName}...`, 'info');
+            
+            safeGoogleScriptCall(
+                'validateClientConfiguration',
+                function(validation) {
+                    let content = '';
+                    if (validation.isValid) {
+                        content = `<div class="alert alert-success">
+                            <h4><i class="fas fa-check-circle"></i> Setup Valid</h4>
+                            <p>${escapeHtml(clientName)} is properly configured and ready for processing.</p>
+                        </div>`;
+                    } else {
+                        content = `<div class="alert alert-error">
+                            <h4><i class="fas fa-exclamation-circle"></i> Setup Issues Found</h4>
+                            <ul>`;
+                        validation.errors.forEach(error => {
+                            content += `<li>${escapeHtml(error)}</li>`;
+                        });
+                        content += `</ul></div>`;
+                    }
+                    
+                    document.getElementById('statusContent').innerHTML = content;
+                },
+                function(error) {
+                    showStatusModal(`Validation failed: ${error.message}`, 'error');
+                },
+                clientName
+            );
+        }
+
+        // System functions
+        function showSystemStatus() {
+            if (!isGoogleAppsScriptEnvironment()) {
+                showStatusModal('This feature requires Google Apps Script environment.', 'warning');
+                return;
+            }
+            
+            showStatusModal('Loading system diagnostics...', 'info');
+            
+            safeGoogleScriptCall(
+                'runSystemDiagnostic',
+                function(diagnostic) {
+                    displaySystemDiagnostic(diagnostic);
+                },
+                function(error) {
+                    showStatusModal(`Error loading system diagnostics: ${error.message}`, 'error');
+                }
+            );
+        }
+
+        function displaySystemDiagnostic(diagnostic) {
+            let content = `<div class="alert alert-${diagnostic.overall === 'healthy' ? 'success' : diagnostic.overall === 'error' ? 'error' : 'warning'}">
+                <h4><i class="fas fa-heartbeat"></i> System Diagnostic</h4>
+                <p><strong>Overall Status:</strong> ${escapeHtml(diagnostic.overall)}</p>
+                <p><strong>Last Check:</strong> ${new Date(diagnostic.timestamp).toLocaleString()}</p>
+            </div>`;
+            
+            if (diagnostic.components) {
+                content += '<h5>Component Status:</h5><ul>';
+                Object.entries(diagnostic.components).forEach(([key, value]) => {
+                    const icon = value === 'ok' || value === 'healthy' ? 
+                        '<i class="fas fa-check" style="color: var(--success-color);"></i>' : 
+                        '<i class="fas fa-times" style="color: var(--error-color);"></i>';
+                    content += `<li>${icon} <strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</li>`;
+                });
+                content += '</ul>';
+            }
+            
+            if (diagnostic.issues && diagnostic.issues.length > 0) {
+                content += '<h5>Issues:</h5><ul>';
+                diagnostic.issues.forEach(issue => {
+                    content += `<li><i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> ${escapeHtml(issue)}</li>`;
+                });
+                content += '</ul>';
+            }
+            
+            if (diagnostic.recommendations && diagnostic.recommendations.length > 0) {
+                content += '<h5>Recommendations:</h5><ul>';
+                diagnostic.recommendations.forEach(rec => {
+                    content += `<li><i class="fas fa-lightbulb" style="color: var(--info-color);"></i> ${escapeHtml(rec)}</li>`;
+                });
+                content += '</ul>';
+            }
+            
+            document.getElementById('statusContent').innerHTML = content;
+            document.getElementById('statusModalTitle').textContent = 'System Diagnostic';
+        }
+
+        function runSystemDiagnostic() {
+            showSystemStatus(); // Same as system status for now
+        }
+
+        // Modal functions
+        function showStatusModal(message, type = 'info') {
+            try {
+                const modal = document.getElementById('statusModal');
+                const content = document.getElementById('statusContent');
+                const title = document.getElementById('statusModalTitle');
+                
+                if (!modal || !content) {
+                    alert(message);
+                    return;
+                }
+                
+                let alertClass = 'alert-info';
+                let icon = '<div class="loading"></div>';
+                let titleText = 'Processing';
+                
+                switch (type) {
+                    case 'error':
+                        alertClass = 'alert-error';
+                        icon = '<i class="fas fa-exclamation-circle"></i>';
+                        titleText = 'Error';
+                        break;
+                    case 'warning':
+                        alertClass = 'alert-warning';
+                        icon = '<i class="fas fa-exclamation-triangle"></i>';
+                        titleText = 'Warning';
+                        break;
+                    case 'success':
+                        alertClass = 'alert-success';
+                        icon = '<i class="fas fa-check-circle"></i>';
+                        titleText = 'Success';
+                        break;
+                    case 'info':
+                    default:
+                        icon = '<div class="loading"></div>';
+                        titleText = 'Processing';
+                        break;
+                }
+                
+                content.innerHTML = `
+                    <div class="alert ${alertClass}">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            ${icon}
+                            <div>${escapeHtml(message)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                title.textContent = titleText;
+                modal.style.display = 'block';
+                
+                // Auto-hide success messages after 3 seconds
+                if (type === 'success') {
+                    setTimeout(() => {
+                        hideStatusModal();
+                    }, 3000);
+                }
+                
+            } catch (error) {
+                console.error('Error in showStatusModal:', error);
+                alert(message);
+            }
+        }
+
+        function hideStatusModal() {
+            try {
+                const modal = document.getElementById('statusModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error hiding status modal:', error);
+            }
+        }
+
+        function hideAllModals() {
+            hideStatusModal();
+            hideAddClientModal();
+        }
+
+        // Utility functions
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Enhanced error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
+        });
+
+        // Form validation enhancements
+        document.addEventListener('input', function(e) {
+            if (e.target.name === 'gmailLabel') {
+                // Real-time validation for Gmail label
+                const value = e.target.value;
+                const isValid = /^[a-zA-Z0-9-_]*$/.test(value);
+                
+                if (!isValid && value.length > 0) {
+                    e.target.setCustomValidity('Only letters, numbers, hyphens, and underscores allowed');
+                } else {
+                    e.target.setCustomValidity('');
+                }
+            }
+        });
+
+        // Accessibility improvements
+        document.addEventListener('keydown', function(e) {
+            // Enter key in modal forms
+            if (e.key === 'Enter' && e.target.closest('.modal')) {
+                const form = e.target.closest('form');
+                if (form) {
+                    e.preventDefault();
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
+        // Performance monitoring
+        let performanceMetrics = {
+            pageLoadTime: 0,
+            apiCalls: 0,
+            lastUpdateTime: Date.now()
+        };
+
+        // Track page load time
+        window.addEventListener('load', function() {
+            performanceMetrics.pageLoadTime = performance.now();
+            console.log(`Dashboard loaded in ${performanceMetrics.pageLoadTime.toFixed(2)}ms`);
+        });
+
+        // Debug helper for development
+        function debugDashboard() {
+            console.log('Dashboard Debug Info:', {
+                currentOperation: currentOperation,
+                refreshTimer: refreshTimer,
+                performanceMetrics: performanceMetrics,
+                dashboardData: dashboardData
+            });
+        }
+
+        // Expose debug function globally for development
+        window.debugDashboard = debugDashboard;
+
+        // Add navigation debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('client-dashboard-link')) {
+                    console.log('=== NAVIGATION DEBUG ===');
+                    console.log('Client dashboard link clicked:', event.target.dataset.clientName);
+                    console.log('Target URL:', event.target.href);
+                    console.log('Current URL:', window.location.href);
+                    
+                    // Don't prevent default - let normal navigation happen
+                    // But log if there are any issues
+                    setTimeout(() => {
+                        console.log('Navigation attempted, new URL should be:', event.target.href);
+                    }, 100);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

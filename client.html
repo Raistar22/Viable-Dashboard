@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= client.name ?> - Client Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .client-info h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .client-info p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2563eb;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .pending-changes {
+            border-left: 4px solid var(--warning-color);
+            background: #fffbeb;
+        }
+
+        .pending-changes.has-reactivations {
+            border-left-color: var(--info-color);
+            background: #eff6ff;
+        }
+
+        .change-item {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid var(--gray-200);
+        }
+
+        .change-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .change-filename {
+            font-weight: 500;
+            color: var(--gray-800);
+            word-break: break-word;
+        }
+
+        .change-type {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .change-type.deletion {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .change-type.reactivation {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .change-reason {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-top: 0.25rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            color: var(--gray-800);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-section {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-processing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .flow-visualization {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 100px;
+        }
+
+        .flow-arrow {
+            color: var(--gray-400);
+            font-size: 1.5rem;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-600);
+        }
+
+        .error-state i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--error-color);
+        }
+
+        .breadcrumb {
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                flex: none;
+            }
+
+            .flow-visualization {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="client-info">
+                    <h1><i class="fas fa-building"></i> <?= client.name ?></h1>
+                    <p>Gmail Label: <strong><?= client.gmailLabel ?></strong> • Status: <strong><?= client.status ?></strong></p>
+                </div>
+                <div class="header-actions">
+                    <a href="?" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Dashboard
+                    </a>
+                    <a href="<?= 'https://drive.google.com/drive/folders/' + client.rootFolderId ?>" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-folder"></i> Drive Folder
+                    </a>
+                    <a href="<?= 'https://docs.google.com/spreadsheets/d/' + client.spreadsheetId ?>" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-table"></i> Spreadsheet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="?">Dashboard</a> / <span><?= client.name ?></span>
+            </div>
+
+            <!-- Statistics Overview -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="fas fa-inbox"></i> Gmail Processing</h3>
+                    <? if (gmailStats.error) { ?>
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading Gmail stats: <?= gmailStats.error ?></p>
+                    </div>
+                    <? } else { ?>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number"><?= gmailStats.totalFiles || 0 ?></span>
+                            <span class="stat-label">Total Files</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= gmailStats.activeFiles || 0 ?></span>
+                            <span class="stat-label">Active</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= gmailStats.deletedFiles || 0 ?></span>
+                            <span class="stat-label">Deleted</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= gmailStats.uniqueMessages || 0 ?></span>
+                            <span class="stat-label">Unique Messages</span>
+                        </div>
+                    </div>
+                    <? } ?>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="processGmail()" id="processGmailBtn">
+                            <i class="fas fa-envelope"></i> Process Gmail
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-robot"></i> AI Processing</h3>
+                    <? if (aiStats.error) { ?>
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading AI stats: <?= aiStats.error ?></p>
+                    </div>
+                    <? } else { ?>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.pendingProcessing || 0 ?></span>
+                            <span class="stat-label">Pending</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.totalFilesProcessed || 0 ?></span>
+                            <span class="stat-label">Processed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= Math.round((aiStats.averageConfidence || 0) * 100) ?>%</span>
+                            <span class="stat-label">Avg Confidence</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.failedProcessing || 0 ?></span>
+                            <span class="stat-label">Failed</span>
+                        </div>
+                    </div>
+                    <? } ?>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="processAI()" id="processAIBtn">
+                            <i class="fas fa-brain"></i> Process with AI
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-table"></i> Sheet Status</h3>
+                    <? if (sheetStats.error) { ?>
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading sheet stats: <?= sheetStats.error ?></p>
+                    </div>
+                    <? } else { ?>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number"><?= sheetStats.buffer ? sheetStats.buffer.active : 0 ?></span>
+                            <span class="stat-label">Buffer Active</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= sheetStats.final || 0 ?></span>
+                            <span class="stat-label">Final Sheet</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= sheetStats.inflow || 0 ?></span>
+                            <span class="stat-label">Inflow</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= sheetStats.outflow || 0 ?></span>
+                            <span class="stat-label">Outflow</span>
+                        </div>
+                    </div>
+                    <? } ?>
+                    <div class="action-buttons">
+                        <button class="btn btn-info" onclick="moveToFlow()" id="moveToFlowBtn">
+                            <i class="fas fa-arrows-alt"></i> Move to Flow
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pending Changes Card -->
+                <? if (pendingChanges && pendingChanges.hasChanges) { ?>
+                <div class="card pending-changes <?= pendingChanges.reactivations && pendingChanges.reactivations.length > 0 ? 'has-reactivations' : '' ?>">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Pending Changes
+                        <span class="status-badge status-processing">
+                            <?= (pendingChanges.deletions ? pendingChanges.deletions.length : 0) + (pendingChanges.reactivations ? pendingChanges.reactivations.length : 0) ?> pending
+                        </span>
+                    </h3>
+                    
+                    <!-- Deletions -->
+                    <? if (pendingChanges.deletions && pendingChanges.deletions.length > 0) { ?>
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: var(--error-color); margin-bottom: 0.5rem;">
+                            <i class="fas fa-trash"></i> Files to Delete (<?= pendingChanges.deletions.length ?>)
+                        </h4>
+                        <? pendingChanges.deletions.forEach(function(deletion) { ?>
+                        <div class="change-item">
+                            <div class="change-item-header">
+                                <span class="change-filename"><?= deletion.originalFilename ?></span>
+                                <span class="change-type deletion">Delete</span>
+                            </div>
+                            <div class="change-reason"><strong>Reason:</strong> <?= deletion.reason ?></div>
+                        </div>
+                        <? }); ?>
+                    </div>
+                    <? } ?>
+                    
+                    <!-- Reactivations -->
+                    <? if (pendingChanges.reactivations && pendingChanges.reactivations.length > 0) { ?>
+                    <div style="margin-bottom: 1rem;">
+                        <h4 style="color: var(--info-color); margin-bottom: 0.5rem;">
+                            <i class="fas fa-undo"></i> Files to Reactivate (<?= pendingChanges.reactivations.length ?>)
+                        </h4>
+                        <? pendingChanges.reactivations.forEach(function(reactivation) { ?>
+                        <div class="change-item">
+                            <div class="change-item-header">
+                                <span class="change-filename"><?= reactivation.originalFilename ?></span>
+                                <span class="change-type reactivation">Reactivate</span>
+                            </div>
+                            <div class="change-reason">
+                                <strong>Previous:</strong> <?= reactivation.previousReason ?>
+                            </div>
+                            <? if (!reactivation.changedFilename || reactivation.changedFilename === reactivation.originalFilename) { ?>
+                            <div class="change-reason" style="color: var(--warning-color);">
+                                <i class="fas fa-info-circle"></i> Will need AI processing
+                            </div>
+                            <? } ?>
+                        </div>
+                        <? }); ?>
+                    </div>
+                    <? } ?>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-warning" onclick="processBufferChanges()" id="processBufferBtn">
+                            <i class="fas fa-cogs"></i> Process Changes
+                        </button>
+                        <button class="btn btn-info" onclick="validateChanges()" id="validateChangesBtn">
+                            <i class="fas fa-check-circle"></i> Validate
+                        </button>
+                    </div>
+                </div>
+                <? } else if (pendingChanges && pendingChanges.error) { ?>
+                <div class="card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Pending Changes</h3>
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error loading pending changes: <?= pendingChanges.error ?></p>
+                    </div>
+                </div>
+                <? } ?>
+            </div>
+
+            <!-- Processing Flow Visualization -->
+            <div class="card">
+                <h3><i class="fas fa-sitemap"></i> Processing Flow</h3>
+                <div class="flow-visualization">
+                    <div class="flow-step">
+                        <div class="status-badge <?= (gmailStats.activeFiles && gmailStats.activeFiles > 0) ? 'status-processing' : 'status-completed' ?>">
+                            <i class="fas fa-envelope"></i> Gmail
+                        </div>
+                        <div><?= gmailStats.activeFiles || 0 ?> active</div>
+                    </div>
+                    
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    
+                    <div class="flow-step">
+                        <div class="status-badge <?= (sheetStats.buffer && sheetStats.buffer.active > 0) ? 'status-processing' : 'status-completed' ?>">
+                            <i class="fas fa-buffer"></i> Buffer
+                        </div>
+                        <div><?= sheetStats.buffer ? sheetStats.buffer.active : 0 ?> active</div>
+                    </div>
+                    
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    
+                    <div class="flow-step">
+                        <div class="status-badge <?= (aiStats.pendingProcessing && aiStats.pendingProcessing > 0) ? 'status-processing' : 'status-completed' ?>">
+                            <i class="fas fa-robot"></i> AI Processing
+                        </div>
+                        <div><?= aiStats.pendingProcessing || 0 ?> pending</div>
+                    </div>
+                    
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    
+                    <div class="flow-step">
+                        <div class="status-badge <?= (sheetStats.final && sheetStats.final > 0) ? 'status-processing' : 'status-completed' ?>">
+                            <i class="fas fa-clipboard-list"></i> Final
+                        </div>
+                        <div><?= sheetStats.final || 0 ?> ready</div>
+                    </div>
+                    
+                    <i class="fas fa-arrow-right flow-arrow"></i>
+                    
+                    <div class="flow-step">
+                        <div class="status-badge status-completed">
+                            <i class="fas fa-exchange-alt"></i> Flow
+                        </div>
+                        <div><?= (sheetStats.inflow || 0) + (sheetStats.outflow || 0) ?> processed</div>
+                    </div>
+                </div>
+                
+                <? if (pendingChanges && pendingChanges.hasChanges) { ?>
+                <div class="alert alert-warning">
+                    <strong><i class="fas fa-info-circle"></i> Attention:</strong> 
+                    You have <?= (pendingChanges.deletions ? pendingChanges.deletions.length : 0) + (pendingChanges.reactivations ? pendingChanges.reactivations.length : 0) ?> pending buffer changes that should be processed before continuing with the normal flow.
+                </div>
+                <? } ?>
+
+                <!-- Additional Statistics -->
+                <? if (aiStats && !aiStats.error) { ?>
+                <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <h4 style="margin-bottom: 1rem;"><i class="fas fa-chart-bar"></i> AI Processing Details</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.inflowCount || 0 ?></span>
+                            <span class="stat-label">Inflow Documents</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.outflowCount || 0 ?></span>
+                            <span class="stat-label">Outflow Documents</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.highConfidenceCount || 0 ?></span>
+                            <span class="stat-label">High Confidence</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?= aiStats.reactivatedCount || 0 ?></span>
+                            <span class="stat-label">Reactivated</span>
+                        </div>
+                    </div>
+                </div>
+                <? } ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div id="processingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Processing...</h3>
+                <button class="close-btn" onclick="hideProcessingModal()" aria-label="Close">&times;</button>
+            </div>
+            <div id="modalContent">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="loading"></div>
+                    <div>Please wait while we process your request...</div>
+                </div>
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div id="progressText">0% complete</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentOperation = null;
+        const clientName = '<?= client.name ?>';
+        let refreshTimer = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLastRefresh();
+            startAutoRefresh();
+            
+            // Initialize tooltips and accessibility
+            initializeAccessibility();
+        });
+
+        function updateLastRefresh() {
+            const now = new Date();
+            console.log(`Client dashboard loaded at ${now.toLocaleTimeString()}`);
+        }
+
+        function startAutoRefresh() {
+            // Auto-refresh every 60 seconds if no operation is running
+            refreshTimer = setInterval(function() {
+                if (!currentOperation) {
+                    location.reload();
+                }
+            }, 60000);
+        }
+
+        function stopAutoRefresh() {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        }
+
+        function initializeAccessibility() {
+            // Add keyboard navigation support
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            });
+        }
+
+        // Enhanced error handling wrapper
+        function safeExecute(fn, context = '') {
+            try {
+                return fn();
+            } catch (error) {
+                console.error(`Error in ${context}:`, error);
+                showProcessingModal('Error', `Operation failed: ${error.message}`, 'error');
+                return null;
+            }
+        }
+
+        // Gmail Processing
+        function processGmail() {
+            if (currentOperation) {
+                showProcessingModal('Warning', 'Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'gmail';
+            const btn = document.getElementById('processGmailBtn');
+            
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            showProcessingModal('Processing Gmail', 'Downloading attachments from Gmail...', 'info');
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'Gmail processing completed');
+                })
+                .withFailureHandler(function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'Gmail processing failed');
+                })
+                .processClientGmailByName(clientName);
+        }
+
+        // AI Processing
+        function processAI() {
+            if (currentOperation) {
+                showProcessingModal('Warning', 'Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'ai';
+            const btn = document.getElementById('processAIBtn');
+            
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            showProcessingModal('AI Processing', 'Analyzing documents with AI...', 'info');
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'AI processing completed');
+                })
+                .withFailureHandler(function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'AI processing failed');
+                })
+                .processClientDocumentsWithAI(clientName);
+        }
+
+        // Buffer Changes Processing
+        function processBufferChanges() {
+            if (currentOperation) {
+                showProcessingModal('Warning', 'Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'buffer-changes';
+            const btn = document.getElementById('processBufferBtn');
+            
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            showProcessingModal('Processing Buffer Changes', 'Processing deletions and reactivations...', 'info');
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'Buffer changes processed');
+                })
+                .withFailureHandler(function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'Buffer processing failed');
+                })
+                .processBufferChanges(clientName);
+        }
+
+        // Move to Flow
+        function moveToFlow() {
+            if (currentOperation) {
+                showProcessingModal('Warning', 'Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'move-flow';
+            const btn = document.getElementById('moveToFlowBtn');
+            
+            setButtonLoading(btn, true);
+            stopAutoRefresh();
+            showProcessingModal('Moving Files', 'Moving files to inflow/outflow...', 'info');
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessComplete(result, 'Files moved to flow');
+                })
+                .withFailureHandler(function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    startAutoRefresh();
+                    onProcessError(error, 'Flow processing failed');
+                })
+                .moveFilesToInflowOutflow(clientName);
+        }
+
+        // Validate Changes
+        function validateChanges() {
+            if (currentOperation) {
+                showProcessingModal('Warning', 'Another operation is in progress. Please wait.', 'warning');
+                return;
+            }
+
+            currentOperation = 'validate';
+            const btn = document.getElementById('validateChangesBtn');
+            
+            setButtonLoading(btn, true);
+            showProcessingModal('Validating Changes', 'Checking pending changes...', 'info');
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    onValidationComplete(result);
+                })
+                .withFailureHandler(function(error) {
+                    currentOperation = null;
+                    setButtonLoading(btn, false);
+                    onProcessError(error, 'Validation failed');
+                })
+                .validatePendingReactivations(clientName);
+        }
+
+        // Enhanced button loading state management
+        function setButtonLoading(button, loading) {
+            if (!button) return;
+            
+            const icon = button.querySelector('i');
+            const text = button.childNodes[button.childNodes.length - 1];
+            
+            if (loading) {
+                button.disabled = true;
+                button.style.opacity = '0.7';
+                if (icon) {
+                    icon.className = 'fas fa-spinner fa-spin';
+                }
+            } else {
+                button.disabled = false;
+                button.style.opacity = '1';
+                if (icon) {
+                    // Restore original icon - this is basic, could be enhanced
+                    if (button.id === 'processGmailBtn') icon.className = 'fas fa-envelope';
+                    else if (button.id === 'processAIBtn') icon.className = 'fas fa-brain';
+                    else if (button.id === 'processBufferBtn') icon.className = 'fas fa-cogs';
+                    else if (button.id === 'moveToFlowBtn') icon.className = 'fas fa-arrows-alt';
+                    else if (button.id === 'validateChangesBtn') icon.className = 'fas fa-check-circle';
+                }
+            }
+        }
+
+        // Process completion handlers
+        function onProcessComplete(result, defaultMessage) {
+            const message = result?.message || defaultMessage || 'Operation completed successfully';
+            showProcessResult(result, message);
+            
+            // Reload page after 3 seconds to show updated stats
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        }
+
+        function onValidationComplete(result) {
+            currentOperation = null;
+            showValidationResult(result);
+        }
+
+        function onProcessError(error, context) {
+            const message = error?.message || error || 'An unknown error occurred';
+            showProcessingModal('Error', `${context}: ${message}`, 'error');
+        }
+
+        function showProcessResult(result, message) {
+            let content = '';
+            let type = 'success';
+            
+            if (result && result.success === false) {
+                type = 'error';
+                content = `<div class="alert alert-error">
+                    <h4><i class="fas fa-exclamation-circle"></i> Operation Failed</h4>
+                    <p>${result.message || result.error}</p>
+                </div>`;
+            } else {
+                content = `<div class="alert alert-success">
+                    <h4><i class="fas fa-check-circle"></i> ${message}</h4>`;
+                
+                if (result && typeof result === 'object') {
+                    if (result.deletedCount !== undefined || result.reactivatedCount !== undefined) {
+                        content += `<div style="margin-top: 1rem;">`;
+                        if (result.deletedCount > 0) {
+                            content += `<p><i class="fas fa-trash"></i> Processed ${result.deletedCount} deletions</p>`;
+                        }
+                        if (result.reactivatedCount > 0) {
+                            content += `<p><i class="fas fa-undo"></i> Processed ${result.reactivatedCount} reactivations</p>`;
+                        }
+                        content += `</div>`;
+                    }
+                    
+                    if (result.inflowCount !== undefined || result.outflowCount !== undefined) {
+                        content += `<div style="margin-top: 1rem;">
+                            <p><i class="fas fa-arrow-up"></i> Moved ${result.inflowCount || 0} files to inflow</p>
+                            <p><i class="fas fa-arrow-down"></i> Moved ${result.outflowCount || 0} files to outflow</p>
+                        </div>`;
+                    }
+
+                    if (result.processedAttachments !== undefined) {
+                        content += `<div style="margin-top: 1rem;">
+                            <p><i class="fas fa-paperclip"></i> Processed ${result.processedAttachments} attachments</p>
+                            <p><i class="fas fa-envelope"></i> Found ${result.totalAttachments || 0} total attachments</p>
+                        </div>`;
+                    }
+
+                    if (result.processed !== undefined) {
+                        content += `<div style="margin-top: 1rem;">
+                            <p><i class="fas fa-robot"></i> Processed ${result.processed} files with AI</p>
+                            <p><i class="fas fa-exclamation-triangle"></i> ${result.errors || 0} errors encountered</p>
+                        </div>`;
+                    }
+                }
+                
+                content += `<p style="margin-top: 1rem; font-size: 0.875rem; color: var(--gray-600);">
+                    <i class="fas fa-sync"></i> Page will refresh automatically in 3 seconds...
+                </p>`;
+                content += `</div>`;
+            }
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modalTitle').textContent = type === 'success' ? 'Success' : 'Error';
+        }
+
+        function showValidationResult(result) {
+            let content = '';
+            
+            if (result && result.isValid) {
+                content = `<div class="alert alert-success">
+                    <h4><i class="fas fa-check-circle"></i> Validation Passed</h4>
+                    <p>All pending changes are valid and ready to process.</p>
+                    <p><strong>Pending reactivations:</strong> ${result.reactivations ? result.reactivations.length : 0}</p>
+                </div>`;
+            } else {
+                content = `<div class="alert alert-error">
+                    <h4><i class="fas fa-exclamation-circle"></i> Validation Failed</h4>
+                    <p>Please fix the following issues before processing:</p>
+                    <ul>`;
+                
+                if (result && result.errors) {
+                    result.errors.forEach(error => {
+                        content += `<li>${error}</li>`;
+                    });
+                }
+                content += `</ul>`;
+                
+                if (result && result.warnings && result.warnings.length > 0) {
+                    content += `<div style="margin-top: 1rem;"><strong>Warnings:</strong><ul>`;
+                    result.warnings.forEach(warning => {
+                        content += `<li>${warning}</li>`;
+                    });
+                    content += `</ul></div>`;
+                }
+                content += `</div>`;
+            }
+            
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modalTitle').textContent = 'Validation Results';
+        }
+
+        // Modal functions
+        function showProcessingModal(title, message, type = 'info') {
+            const modal = document.getElementById('processingModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalTitle.textContent = title;
+            
+            let alertClass = 'alert';
+            let icon = '<div class="loading"></div>';
+            
+            switch (type) {
+                case 'error':
+                    alertClass = 'alert alert-error';
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    alertClass = 'alert alert-warning';
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+                case 'success':
+                    alertClass = 'alert alert-success';
+                    icon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'info':
+                default:
+                    icon = '<div class="loading"></div>';
+                    break;
+            }
+            
+            modalContent.innerHTML = `
+                <div class="${alertClass}">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        ${icon}
+                        <div>${message}</div>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function hideProcessingModal() {
+            document.getElementById('processingModal').style.display = 'none';
+        }
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideProcessingModal();
+            } else if (e.key === 'r' && e.ctrlKey) {
+                e.preventDefault();
+                location.reload();
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('processingModal');
+            if (event.target === modal) {
+                hideProcessingModal();
+            }
+        }
+
+        // Enhanced error logging
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
+        });
+    </script>
+</body>
+</html>
